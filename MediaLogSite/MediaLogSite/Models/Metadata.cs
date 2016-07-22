@@ -1,0 +1,35 @@
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace MediaLogSite.Models
+{
+    public class UserMetadata
+    {
+        [StringLength(50)]
+        [Display(Name = "User Name")]
+        public string UserName;
+
+        [StringLength(50)]
+        [Display(Name = "Email")]
+        public string Email;
+
+        [StringLength(50)]
+        [Display(Name = "Password")]
+        public string Password;
+    }
+
+    public class LogMetadata
+    {
+        [StringLength(50)]
+        [Display(Name = "Title")]
+        public string Title;
+
+        [Range(0, 10)]
+        [Display(Name = "Rating")]
+        public Nullable<decimal> Rating;
+
+        [Range(0, 1000)]
+        [Display(Name = "Time")]
+        public Nullable<decimal> Time;
+    }
+}
