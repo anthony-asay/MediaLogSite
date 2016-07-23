@@ -40,7 +40,7 @@
                 @Html.ValidationMessageFor(model => model.Time, "", new { @class = "text-danger" })
             </div>
         </div>
-
+        @Html.HiddenFor(model => model.Date)
         @Html.HiddenFor(model => model.UserID)
 
         <div class="form-group">
@@ -60,7 +60,7 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Back to List", "Details", "Users", routeValues: null, htmlAttributes: new { title = "userHomeLink" })
 </div>
 
 @section Scripts {

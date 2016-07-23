@@ -19,45 +19,13 @@ namespace MediaLogSite.Controllers
     [Authorize]
     public class UsersController : Controller
     {
-        private ApplicationSignInManager _signInManager;
-        private ApplicationUserManager _userManager;
         private mediaConsumptionDataEntities db = new mediaConsumptionDataEntities();
-        
-
 
         public UsersController()
         {
         }
 
-        public UsersController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
-        {
-            this.UserManager = userManager;
-            this.SignInManager = signInManager;
-        }
-
-        public ApplicationSignInManager SignInManager
-        {
-            get
-            {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-            }
-            private set
-            {
-                _signInManager = value;
-            }
-        }
-
-        public ApplicationUserManager UserManager
-        {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
-        }
+       
         // GET: Users
         public ActionResult Index()
         {
@@ -72,6 +40,13 @@ namespace MediaLogSite.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        public ActionResult Logout()
+        {
+            Session.Clear();
+            return RedirectToAction("Index", "Home");
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -82,35 +57,15 @@ namespace MediaLogSite.Controllers
                 return View(model);
             }
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, false, shouldLockout: false);
-
             string query = "SELECT * FROM Users WHERE Email = @p0 AND Password = @p1";
             User user = await db.Users.SqlQuery(query, model.Email, model.Password).SingleOrDefaultAsync();
-            if(user == null)
+            if (user == null)
             {
                 ModelState.AddModelError("", "Invalid login attempt.");
                 return View(model);
             }
-            else
-            {
-                switch (result)
-                {
-                    case SignInStatus.Success:
-                        Session["userID"] = user.UserID;
-                        return RedirectToAction("Details");
-                    case SignInStatus.LockedOut:
-                        return View("Lockout");
-                    case SignInStatus.RequiresVerification:
-                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
-                    case SignInStatus.Failure:
-                    default:
-                        ModelState.AddModelError("", "Invalid login attempt.");
-                        return View(model);
-                }
-            }
-            
+                Session["userID"] = user.UserID;
+                return RedirectToAction("Details");
         }
 
         // GET: Users/Details/5
@@ -136,28 +91,21 @@ namespace MediaLogSite.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public ActionResult Register(User user)
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    var userNew = new User { UserName = user.UserName, Email = user.Email, Password = model.Password };
-                    db.Users.Add(userNew);
-                    db.SaveChanges();
-                    int idU = userNew.UserID;
-                    Session.Add("user", user);
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                    return RedirectToAction("Details");
-                    //return Details(id);
-                }
-                AddErrors(result);
+                var userNew = new User { UserName = user.Email, Email = user.Email, Password = user.Password };
+                db.Users.Add(userNew);
+                db.SaveChanges();
+                int idU = userNew.UserID;
+                Session["userID"] = userNew.UserID;
+                Session.Add("user", user);
+                return RedirectToAction("Details");
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return View(user);
         }
 
         // GET: Users/Edit/5
@@ -182,7 +130,18 @@ namespace MediaLogSite.Controllers
             {
                 db.Entry(user).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details");
+            }
+            return View(user);
+        }
+
+        public ActionResult BarGraph()
+        {
+            User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);
+            ViewBag.userId = user.UserID;
+            if (user == null)
+            {
+                return HttpNotFound();
             }
             return View(user);
         }
@@ -206,7 +165,7 @@ namespace MediaLogSite.Controllers
             User user = db.Users.Find(id);
             db.Users.Remove(user);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Home");
         }
 
         protected override void Dispose(bool disposing)

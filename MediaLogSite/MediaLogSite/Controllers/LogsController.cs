@@ -41,7 +41,6 @@ namespace MediaLogSite.Controllers
         {
             int id = (int) System.Web.HttpContext.Current.Session["userID"];
             ViewBag.MediaID = new SelectList(db.Media, "MediaID", "Title");
-            //ViewBag.UserID = new SelectList(db.Users, "UserID", "UserName");
             ViewBag.userID = id;
             return View();
         }
@@ -55,10 +54,9 @@ namespace MediaLogSite.Controllers
         {
             if (ModelState.IsValid)
             {
-               
                 db.Logs.Add(log);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", "Users");
             }
 
             ViewBag.MediaID = new SelectList(db.Media, "MediaID", "Title", log.MediaID);
@@ -79,7 +77,6 @@ namespace MediaLogSite.Controllers
                 return HttpNotFound();
             }
             ViewBag.MediaID = new SelectList(db.Media, "MediaID", "Title", log.MediaID);
-            ViewBag.UserID = new SelectList(db.Users, "UserID", "UserName", log.UserID);
             return View(log);
         }
 
@@ -88,16 +85,16 @@ namespace MediaLogSite.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "LogID,Title,Rating,Time,UserID,MediaID")] Log log)
+        public ActionResult Edit([Bind(Include = "LogID,Title,Rating,Time,UserID,MediaID,Date")] Log log)
         {
             if (ModelState.IsValid)
             {
                 db.Entry(log).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", "Users");
             }
             ViewBag.MediaID = new SelectList(db.Media, "MediaID", "Title", log.MediaID);
-            ViewBag.UserID = new SelectList(db.Users, "UserID", "UserName", log.UserID);
+            
             return View(log);
         }
 
@@ -124,7 +121,7 @@ namespace MediaLogSite.Controllers
             Log log = db.Logs.Find(id);
             db.Logs.Remove(log);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Users");
         }
 
         protected override void Dispose(bool disposing)

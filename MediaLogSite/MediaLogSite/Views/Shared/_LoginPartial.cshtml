@@ -1,16 +1,16 @@
-﻿@using Microsoft.AspNet.Identity
-@if (Request.IsAuthenticated)
+﻿@model MediaLogSite.Models.User
+@if ((int)Session["userID"] != 0)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
     @Html.AntiForgeryToken()
 
     <ul class="nav navbar-nav navbar-right">
-        <li><a class="logo" href='@Url.Action("Details", "Users", new { id = ViewBag.userID})'></a></li>
+        <li><a class="logo" href='@Url.Action("Details", "Users")'></a></li>
         <li>
-            @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Edit", "Users", new { id = ViewBag.userID }, htmlAttributes: new { title = "Manage" })
+            @Html.ActionLink("Hello " + Model.UserName + "!", "Edit", "Users", routeValues: null, htmlAttributes: new { title = "Manage" })
         </li>
-        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+        <li>@Html.ActionLink("Logoff", "Logout", "Users", routeValues: null, htmlAttributes: new { id = "logoutLink" })</li>
     </ul>
     }
 }
