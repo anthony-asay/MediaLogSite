@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Threading.Tasks;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -21,6 +22,7 @@ namespace MediaLogSite.Controllers
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
         private mediaConsumptionDataEntities db = new mediaConsumptionDataEntities();
+        
 
 
         public UsersController()
@@ -70,14 +72,51 @@ namespace MediaLogSite.Controllers
             return View();
         }
 
-        // GET: Users/Details/5
-        public ActionResult Details(int? id)
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Login(User model, string returnUrl)
         {
-            if (id == null)
+            if (!ModelState.IsValid)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return View(model);
             }
-            User user = db.Users.Find(id);
+
+            // This doesn't count login failures towards account lockout
+            // To enable password failures to trigger account lockout, change to shouldLockout: true
+            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, false, shouldLockout: false);
+
+            string query = "SELECT * FROM Users WHERE Email = @p0 AND Password = @p1";
+            User user = await db.Users.SqlQuery(query, model.Email, model.Password).SingleOrDefaultAsync();
+            if(user == null)
+            {
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
+            }
+            else
+            {
+                switch (result)
+                {
+                    case SignInStatus.Success:
+                        Session["userID"] = user.UserID;
+                        return RedirectToAction("Details");
+                    case SignInStatus.LockedOut:
+                        return View("Lockout");
+                    case SignInStatus.RequiresVerification:
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
+                    case SignInStatus.Failure:
+                    default:
+                        ModelState.AddModelError("", "Invalid login attempt.");
+                        return View(model);
+                }
+            }
+            
+        }
+
+        // GET: Users/Details/5
+        public ActionResult Details()
+        {
+            User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);
             if (user == null)
             {
                 return HttpNotFound();
@@ -85,37 +124,46 @@ namespace MediaLogSite.Controllers
             return View(user);
         }
 
-        // GET: Users/Create
-        public ActionResult Create()
+        // GET: /Account/Register
+        [AllowAnonymous]
+        public ActionResult Register()
         {
             return View();
         }
 
-        // POST: Users/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //
+        // POST: /Account/Register
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "UserID,UserName,Email,Password")] User user)
+        public async Task<ActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-                db.Users.Add(user);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var result = await UserManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    var userNew = new User { UserName = user.UserName, Email = user.Email, Password = model.Password };
+                    db.Users.Add(userNew);
+                    db.SaveChanges();
+                    int idU = userNew.UserID;
+                    Session.Add("user", user);
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    return RedirectToAction("Details");
+                    //return Details(id);
+                }
+                AddErrors(result);
             }
 
-            return View(user);
+            // If we got this far, something failed, redisplay form
+            return View(model);
         }
 
         // GET: Users/Edit/5
-        public ActionResult Edit(int? id)
+        public ActionResult Edit()
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            User user = db.Users.Find(id);
+            User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);
             if (user == null)
             {
                 return HttpNotFound();
@@ -140,13 +188,9 @@ namespace MediaLogSite.Controllers
         }
 
         // GET: Users/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete()
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            User user = db.Users.Find(id);
+            User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);
             if (user == null)
             {
                 return HttpNotFound();
@@ -172,6 +216,23 @@ namespace MediaLogSite.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private ActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("Index", "Home");
+        }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error);
+            }
         }
     }
 }

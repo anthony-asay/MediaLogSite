@@ -4,37 +4,12 @@
     ViewBag.Title = "Details";
 }
 
-<h2>Details</h2>
+<h2>User Home @ViewBag.userID</h2>
 
 <div>
-    <h4>User</h4>
     <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.UserName)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.UserName)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Password)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Password)
-        </dd>
-
-    </dl>
+    @Html.ActionLink("Edit Account", "Edit", "Users", routeValues: null, htmlAttributes: new { id = "editUserLink" })
+    @Html.ActionLink("Add Media Track", "Create", "Logs", routeValues: null, htmlAttributes: new { id = "createLogLink" })
 
     <table class="table">
         <tr>
@@ -50,24 +25,63 @@
             <th>
                 Time
             </th>
+            <th>
+                Date
+            </th>
         </tr>
 
         @foreach (var item in Model.Logs)
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Medium.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>  
-                <td>
-                    @Html.DisplayFor(modelItem => item.Rating)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Time)
-                </td>
-            </tr>
+                    @switch(item.Medium.Title)
+                        {
+                            case "Movie":
+                                <a class="filmIcon iconSmall"></a>
+                            break;
+                            case "Television":
+                                <a class="tvIcon iconSmall"></a>
+                            break;
+                            case "Internet":
+                                <a class="mouseIcon iconSmall"></a>
+                            break;
+                            case "Video Game":
+                                <a class="gameIcon iconSmall"></a>
+                            break;
+                            case "Book":
+                                <a class="bookIcon iconSmall"></a>
+                            break;
+                            case "Music":
+                                <a class="musicIcon iconSmall"></a>
+                            break;
+                    }
+                    </td>
+    
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+    
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Rating)
+                    </td>
+    
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Time)
+                    </td>
+    
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+
+    
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", "Logs", new { id = item.LogID }, htmlAttributes: new { id = "editLogLink" }) |
+                        @Html.ActionLink("Delete", "Delete", "Logs", new { id = item.LogID }, htmlAttributes: new { id = "deleteLogLink" })
+                    </td>
+    
+                   
+    
+                </tr>
         }
     </table>
 </div>

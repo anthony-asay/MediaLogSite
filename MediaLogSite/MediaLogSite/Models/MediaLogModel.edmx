@@ -13,6 +13,7 @@
           <Property Name="Title" Type="nvarchar" MaxLength="50" />
           <Property Name="Rating" Type="decimal" Precision="4" Scale="2" />
           <Property Name="Time" Type="decimal" Precision="6" Scale="2" />
+          <Property Name="Date" Type="datetime" />
           <Property Name="UserID" Type="int" Nullable="false" />
           <Property Name="MediaID" Type="int" Nullable="false" />
         </EntityType>
@@ -85,6 +86,7 @@
           <Property Name="MediaID" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Medium" Relationship="Self.FK_dbo_Log_dbo_Media_MediaID" FromRole="Log" ToRole="Media" />
           <NavigationProperty Name="User" Relationship="Self.FK_dbo_Log_dbo_Users_UserID" FromRole="Log" ToRole="Users" />
+          <Property Name="Date" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="Medium">
           <Key>
@@ -150,6 +152,7 @@
           <EntitySetMapping Name="Logs">
             <EntityTypeMapping TypeName="mediaConsumptionDataModel.Log">
               <MappingFragment StoreEntitySet="Log">
+                <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="LogID" ColumnName="LogID" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="Rating" ColumnName="Rating" />

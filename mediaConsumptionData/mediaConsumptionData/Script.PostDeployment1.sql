@@ -1,4 +1,4 @@
-﻿MERGE INTO Media AS Target 
+﻿/*MERGE INTO Media AS Target 
 USING (VALUES 
         (1, 'Movie'), 
         (2, 'Book'), 
@@ -37,4 +37,4 @@ AS Source (LogID, Title, Rating, Time, UserID, MediaID)
 ON Target.UserID = Source.UserID
 WHEN NOT MATCHED BY TARGET THEN
 INSERT (Title, Rating, Time, UserID, MediaID)
-VALUES (Title, Rating, Time, UserID, MediaID);
+VALUES (Title, Rating, Time, UserID, MediaID);*/

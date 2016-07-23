@@ -3,6 +3,7 @@
 	[Title]    NVARCHAR (50) NULL,
     [Rating]        DECIMAL(4, 2) NULL,
 	[Time]        DECIMAL(6, 2) NULL,
+	[Date]    DATETIME DEFAULT GETDATE(),
     [UserID]     INT NOT NULL,
     [MediaID]    INT NOT NULL,
     PRIMARY KEY CLUSTERED ([LogID] ASC),

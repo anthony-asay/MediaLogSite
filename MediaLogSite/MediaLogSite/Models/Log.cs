@@ -20,6 +20,7 @@ namespace MediaLogSite.Models
         public Nullable<decimal> Time { get; set; }
         public int UserID { get; set; }
         public int MediaID { get; set; }
+        public Nullable<System.DateTime> Date { get; set; }
     
         public virtual Medium Medium { get; set; }
         public virtual User User { get; set; }
