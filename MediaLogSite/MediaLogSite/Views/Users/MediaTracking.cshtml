@@ -1,7 +1,69 @@
-﻿<div>
+﻿@using MediaLogSite.Models;
+@{
+
+
+    var myMedia = new Dictionary<string, decimal>
+        ();
+    myMedia.Add("Movie", 0);
+    myMedia.Add("Television", 0);
+    myMedia.Add("Video Game", 0);
+    myMedia.Add("Internet", 0);
+    myMedia.Add("Music", 0);
+    myMedia.Add("Book", 0);
+    List<string> mediaList = new List<string>(myMedia.Keys);
+    foreach (var item in Model.Logs)
+    {
+        myMedia[item.Medium.Title] += (decimal)item.Time;
+    }
+    List<decimal> hoursList = new List<decimal>(myMedia.Values);
+}
+<div>
     <h1>Media Usage</h1>
     <p><img src="@Url.Action("BarGraph","Users")" /> </p>
 
     <p><img src="@Url.Action("PieGraph","Users")" /> </p>
-    <p><img src="@Url.Action("LineGraph","Users")" /> </p>
+    <table class="table">
+        <tr>
+            <th>
+                Media Type
+            </th>
+            <th>
+                Total Hours
+            </th>
+        </tr>
+
+        @foreach (var item in myMedia)
+        {
+            <tr>
+                <td>
+                    @switch (item.Key)
+                    {
+                        case "Movie":
+                            <a class="filmIcon iconSmall"></a>
+                            break;
+                        case "Television":
+                            <a class="tvIcon iconSmall"></a>
+                            break;
+                        case "Internet":
+                            <a class="mouseIcon iconSmall"></a>
+                            break;
+                        case "Video Game":
+                            <a class="gameIcon iconSmall"></a>
+                            break;
+                        case "Book":
+                            <a class="bookIcon iconSmall"></a>
+                            break;
+                        case "Music":
+                            <a class="musicIcon iconSmall"></a>
+                            break;
+                    }
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Value)
+                </td>
+            </tr>
+        }
+    </table>
+
 </div>

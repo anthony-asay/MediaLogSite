@@ -164,7 +164,8 @@ namespace MediaLogSite.Controllers
         [AllowAnonymous]
         public ActionResult MediaTracking()
         {
-            return View();
+            User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);
+            return View(user);
         }
 
         // GET: Users/Delete/5

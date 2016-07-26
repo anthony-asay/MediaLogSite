@@ -1,7 +1,12 @@
 ﻿@{
-    ViewBag.Title = "About";
+    ViewBag.Title = "What we're about";
 }
-<h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
 
-<p>This site is meant for users to track their media use in order to lower the amount of time they spend using particular types of media.</p>
+<div class="jumbotron">
+    <a class="logoBlack"></a><a class="filmIcon"></a><a class="gameIcon"></a><a class="musicIcon"></a><a class="bookIcon"></a><a class="mouseIcon"></a><a class="tvIcon"></a>
+    <h2>@ViewBag.Title.</h2>
+    <p class="lead">This site is meant for users to track their media use in order to lower the amount of time they spend with particular types of media.</p>
+    <p class="lead">You can view media usage statistics in graphs.</p>
+    <p>@Html.ActionLink("Register Now", "Register", "Users", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "btn btn-primary btn-lg" })</p>
+
+</div>
