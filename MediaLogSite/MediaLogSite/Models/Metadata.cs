@@ -11,10 +11,13 @@ namespace MediaLogSite.Models
 
         [StringLength(50)]
         [Display(Name = "Email")]
+        [Required]
         public string Email;
 
-        [StringLength(50)]
+        [StringLength(20, MinimumLength = 8)]
         [Display(Name = "Password")]
+        [DataType(DataType.Password)]
+        [Required]
         public string Password;
     }
 

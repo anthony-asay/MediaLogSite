@@ -34,9 +34,8 @@ namespace MediaLogSite.Controllers
 
         // GET: /Account/Login
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public ActionResult Login()
         {
-            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
@@ -50,7 +49,7 @@ namespace MediaLogSite.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(User model, string returnUrl)
+        public async Task<ActionResult> Login(User model)
         {
             if (!ModelState.IsValid)
             {
@@ -65,10 +64,12 @@ namespace MediaLogSite.Controllers
                 return View(model);
             }
                 Session["userID"] = user.UserID;
-                return RedirectToAction("Details");
+                Session["userName"] = user.UserName;
+                return RedirectToAction("Details", "Users");
         }
 
         // GET: Users/Details/5
+        [AllowAnonymous]
         public ActionResult Details()
         {
             User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);
@@ -91,17 +92,17 @@ namespace MediaLogSite.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult Register(User user)
+        public ActionResult Register(RegisterUser user)
         {
             if (ModelState.IsValid)
             {
-                var userNew = new User { UserName = user.Email, Email = user.Email, Password = user.Password };
+                var userNew = new User { UserName = user.UserName, Email = user.Email, Password = user.Password };
                 db.Users.Add(userNew);
                 db.SaveChanges();
                 int idU = userNew.UserID;
                 Session["userID"] = userNew.UserID;
-                Session.Add("user", user);
-                return RedirectToAction("Details");
+                Session["userName"] = userNew.UserName;
+                return RedirectToAction("Details", "Users");
             }
 
             // If we got this far, something failed, redisplay form
@@ -109,6 +110,7 @@ namespace MediaLogSite.Controllers
         }
 
         // GET: Users/Edit/5
+        [AllowAnonymous]
         public ActionResult Edit()
         {
             User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);
@@ -130,11 +132,12 @@ namespace MediaLogSite.Controllers
             {
                 db.Entry(user).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Details");
+                return RedirectToAction("Details", "Users");
             }
             return View(user);
         }
 
+        [AllowAnonymous]
         public ActionResult BarGraph()
         {
             User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);
@@ -146,7 +149,26 @@ namespace MediaLogSite.Controllers
             return View(user);
         }
 
+        [AllowAnonymous]
+        public ActionResult PieGraph()
+        {
+            User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);
+            ViewBag.userId = user.UserID;
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            return View(user);
+        }
+
+        [AllowAnonymous]
+        public ActionResult MediaTracking()
+        {
+            return View();
+        }
+
         // GET: Users/Delete/5
+        [AllowAnonymous]
         public ActionResult Delete()
         {
             User user = db.Users.Find(System.Web.HttpContext.Current.Session["userID"]);

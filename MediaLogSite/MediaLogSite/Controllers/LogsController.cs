@@ -10,6 +10,7 @@ using MediaLogSite.Models;
 
 namespace MediaLogSite.Controllers
 {
+    
     public class LogsController : Controller
     {
         private mediaConsumptionDataEntities db = new mediaConsumptionDataEntities();
@@ -58,7 +59,6 @@ namespace MediaLogSite.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Details", "Users");
             }
-
             ViewBag.MediaID = new SelectList(db.Media, "MediaID", "Title", log.MediaID);
             ViewBag.UserID = new SelectList(db.Users, "UserID", "UserName", log.UserID);
             return View(log);

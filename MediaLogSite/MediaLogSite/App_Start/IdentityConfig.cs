@@ -14,7 +14,7 @@ using MediaLogSite.Models;
 
 namespace MediaLogSite
 {
-    public class EmailService : IIdentityMessageService
+    /*public class EmailService : IIdentityMessageService
     {
         public Task SendAsync(IdentityMessage message)
         {
@@ -105,5 +105,5 @@ namespace MediaLogSite
         {
             return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
         }
-    }
+    }*/
 }

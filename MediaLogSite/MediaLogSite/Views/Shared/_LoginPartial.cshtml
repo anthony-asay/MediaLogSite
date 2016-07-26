@@ -1,18 +1,15 @@
-﻿@model MediaLogSite.Models.User
-@if ((int)Session["userID"] != 0)
+﻿
+@if (Session["userId"] != null)
 {
-    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
-    {
-    @Html.AntiForgeryToken()
 
     <ul class="nav navbar-nav navbar-right">
         <li><a class="logo" href='@Url.Action("Details", "Users")'></a></li>
         <li>
-            @Html.ActionLink("Hello " + Model.UserName + "!", "Edit", "Users", routeValues: null, htmlAttributes: new { title = "Manage" })
+            @Html.ActionLink("Hello " + Session["userName"] + "!", "Edit", "Users", routeValues: null, htmlAttributes: new { title = "Manage" })
         </li>
         <li>@Html.ActionLink("Logoff", "Logout", "Users", routeValues: null, htmlAttributes: new { id = "logoutLink" })</li>
     </ul>
-    }
+    
 }
 else
 {

@@ -1,0 +1,27 @@
+﻿@using MediaLogSite.Models;
+@{
+
+
+    var myMedia = new Dictionary<string, decimal>
+        ();
+    myMedia.Add("Movie", 0);
+    myMedia.Add("Television", 0);
+    myMedia.Add("Video Game", 0);
+    myMedia.Add("Internet", 0);
+    myMedia.Add("Music", 0);
+    myMedia.Add("Book", 0);
+    List<string> mediaList = new List<string>(myMedia.Keys);
+    foreach (var item in Model.Logs)
+    {
+        myMedia[item.Medium.Title] += (decimal)item.Time;
+    }
+    List<decimal> hoursList = new List<decimal>(myMedia.Values);
+    var myChart = new Chart(width: 600, height: 400, theme: ChartTheme.Green)
+    .AddTitle("Media Usage")
+    .AddSeries(
+    name: "Media",
+    chartType: "Pie",
+    xValue: mediaList,
+    yValues: hoursList)
+    .Write();
+}
